@@ -67,53 +67,54 @@ with col2:
         st.info("タスクをすべて削除しました")
         st.rerun()
 
+def display_task_list(tasks):
+    """タスク一覧を表示する関数"""
+    if tasks:
+        for task in tasks:
+            col_check, col_title, col_delete = st.columns([0.5, 4, 0.5])
+            
+            # チェックボックス
+            with col_check:
+                new_status = st.checkbox(
+                    "完了",
+                    value=task["done"],
+                    key=f"checkbox_{task['id']}"
+                )
+                if new_status != task["done"]:
+                    task["done"] = new_status
+                    save_todos(st.session_state["tasks"])
+                    st.rerun()
+            
+            # タスク名（完了時は打ち消し線）
+            with col_title:
+                if task["done"]:
+                    st.write(f"~~{task['title']}~~")
+                else:
+                    st.write(task["title"])
+            
+            # 削除ボタン
+            with col_delete:
+                if st.button("🗑️", key=f"delete_{task['id']}"):
+                    st.session_state["tasks"] = [
+                        t for t in st.session_state["tasks"]
+                        if t["id"] != task["id"]
+                    ]
+                    save_todos(st.session_state["tasks"])
+                    st.rerun()
+    else:
+        st.info("タスクはまだありません。")
+
 # タスク表示フィルター
 st.subheader("タスク一覧")
 tab1, tab2, tab3 = st.tabs(["すべて", "未完了", "完了"])
 
 with tab1:
-    display_tasks = st.session_state["tasks"]
-    label = "すべてのタスク"
+    display_task_list(st.session_state["tasks"])
 
 with tab2:
-    display_tasks = [t for t in st.session_state["tasks"] if not t["done"]]
-    label = "未完了のタスク"
+    incomplete_tasks = [t for t in st.session_state["tasks"] if not t["done"]]
+    display_task_list(incomplete_tasks)
 
 with tab3:
-    display_tasks = [t for t in st.session_state["tasks"] if t["done"]]
-    label = "完了したタスク"
-
-if display_tasks:
-    for task in display_tasks:
-        col_check, col_title, col_delete = st.columns([0.5, 4, 0.5])
-        
-        # チェックボックス
-        with col_check:
-            new_status = st.checkbox(
-                "完了",
-                value=task["done"],
-                key=f"checkbox_{task['id']}"
-            )
-            if new_status != task["done"]:
-                task["done"] = new_status
-                save_todos(st.session_state["tasks"])
-                st.rerun()
-        
-        # タスク名（完了時は打ち消し線）
-        with col_title:
-            if task["done"]:
-                st.write(f"~~{task['title']}~~")
-            else:
-                st.write(task["title"])
-        
-        # 削除ボタン
-        with col_delete:
-            if st.button("🗑️", key=f"delete_{task['id']}"):
-                st.session_state["tasks"] = [
-                    t for t in st.session_state["tasks"]
-                    if t["id"] != task["id"]
-                ]
-                save_todos(st.session_state["tasks"])
-                st.rerun()
-else:
-    st.info("タスクはまだありません。")
+    completed_tasks = [t for t in st.session_state["tasks"] if t["done"]]
+    display_task_list(completed_tasks)
