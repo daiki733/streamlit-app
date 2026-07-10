@@ -65,9 +65,11 @@ Pythonの仮想環境を作成し、有効化します。
 
 ### 3. ライブラリのインストール
 
-`streamlit` をインストールします。
+依存関係は requirements.txt にまとめています。仮想環境を有効化した後、以下のコマンドでインストールできます。
 
-    pip install streamlit
+    pip install -r requirements.txt
+
+（個別にインストールする場合は: pip install streamlit）
 
 ### 4. `app.py` の作成
 
